@@ -10,3 +10,7 @@ RETURNING *;
 SELECT * FROM students
 ORDER BY id
 LIMIT $1 OFFSET $2;
+
+-- name: GetStudent :one
+SELECT * FROM students
+WHERE id = $1 LIMIT 1;

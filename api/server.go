@@ -14,11 +14,14 @@ type Server struct {
 func NewServer(store *db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
-
+	// API of department
 	router.POST("/departments", server.createDepartment)
 	router.GET("/departments/:id", server.getDepartment)
 	router.GET("/departments", server.listDepartments)
-
+	// API of students
+	router.POST("/students", server.createStudent)
+	router.GET("/students/:id", server.getStudent)
+	router.GET("/students", server.listStudents)
 	server.router = router
 	return server
 }

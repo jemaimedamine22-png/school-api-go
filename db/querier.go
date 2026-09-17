@@ -15,6 +15,7 @@ type Querier interface {
 	DeleteProfessor(ctx context.Context, id int32) error
 	GetDepartment(ctx context.Context, id int32) (Department, error)
 	GetProfessor(ctx context.Context, id int32) (Professor, error)
+	GetStudent(ctx context.Context, id int32) (Student, error)
 	ListDepartments(ctx context.Context) ([]Department, error)
 	ListProfessors(ctx context.Context, arg ListProfessorsParams) ([]Professor, error)
 	ListStudents(ctx context.Context, arg ListStudentsParams) ([]Student, error)
