@@ -5,6 +5,7 @@ import (
     "log"
 
     _ "github.com/lib/pq"
+	"github.com/jemaimedamine22-png/school-api/api"
     "github.com/jemaimedamine22-png/school-api/db"
     "github.com/jemaimedamine22-png/school-api/util"
 )
@@ -28,4 +29,10 @@ func main() {
 	log.Println("connected to database successfully!", store)
 
 	// هنا سنقوم لاحقاً بتشغيل سيرفر Gin وإطلاق الـ API
+	server := api.NewServer(store)
+
+	err = server.Start(config.ServerAddress)
+	if err != nil {
+		log.Fatal("cannot start server:", err)
+	}
 }
