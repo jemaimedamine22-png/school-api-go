@@ -15,7 +15,9 @@ func NewServer(store *db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
 
-	// سنقوم بإضافة مسارات الـ API (Routes) هنا لاحقاً
+	router.POST("/departments", server.createDepartment)
+	router.GET("/departments/:id", server.getDepartment)
+	router.GET("/departments", server.listDepartments)
 
 	server.router = router
 	return server

@@ -17,6 +17,9 @@ INSERT INTO departments (
 )
 RETURNING id, name, created_at
 `
+type CreateDepartmentParams struct {
+    Name string `json:"name"`
+}
 
 func (q *Queries) CreateDepartment(ctx context.Context, name string) (Department, error) {
 	row := q.db.QueryRowContext(ctx, createDepartment, name)
