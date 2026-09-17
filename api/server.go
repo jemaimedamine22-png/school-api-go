@@ -22,6 +22,10 @@ func NewServer(store *db.Store) *Server {
 	router.POST("/students", server.createStudent)
 	router.GET("/students/:id", server.getStudent)
 	router.GET("/students", server.listStudents)
+	// API of professor
+	router.POST("/professors", server.createProfessor)
+	router.GET("/professors/:id", server.getProfessor)
+	router.GET("/professors", server.listProfessors)
 	server.router = router
 	return server
 }
