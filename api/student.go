@@ -22,7 +22,7 @@ func (server *Server) createStudent(ctx *gin.Context) {
 		return
 	}
 
-	// استخدام الـ Struct الذي تفضله وتولده sqlc تلقائياً لوجود أكثر من حقل
+	
 	arg := db.CreateStudentParams{
 		FirstName:    req.FirstName,
 		LastName:     req.LastName,
@@ -70,7 +70,7 @@ type listStudentsRequest struct {
 
 func (server *Server) listStudents(ctx *gin.Context) {
 	var req listStudentsRequest
-	// استخدام ShouldBindQuery لأننا نستقبل البيانات عبر الـ Query Parameters مثل ?page_id=1&page_size=5
+	
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

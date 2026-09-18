@@ -10,7 +10,7 @@ services:
     restart: always
     ports:
       - "80:80"
-      - "443:443" # مخصص لشهادات الأمان HTTPS لاحقاً
+      - "443:443" 
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -25,7 +25,7 @@ services:
     build: .
     container_name: school-api
     restart: always
-    # تم إزالة ports: - "8080:8080" لأن الوصول أصبح حصرياً عبر Nginx
+    
     ports:
       - "8080:8080"
     volumes:

@@ -16,7 +16,7 @@ import (
 func InitTracer(collectorURL string) (*sdktrace.TracerProvider, error) {
 	ctx := context.Background()
 
-	// إنشاء الـ Exporter لإرسال التتبع عبر gRPC إلى otel-collector
+	
 	exporter, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithEndpoint(collectorURL),

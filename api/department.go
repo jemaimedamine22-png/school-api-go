@@ -32,7 +32,7 @@ func (server *Server) createDepartment(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, department)
 }
 
-// تم تعديل النوع هنا إلى int32 ليتطابق مع توليد sqlc لجدول departments
+
 type getDepartmentRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// أمثلة للدوال التي يطلبها الـ main.go
+
 func getDepartments(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Get all departments"})
 }
