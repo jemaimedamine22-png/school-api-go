@@ -8,7 +8,7 @@ dropdb:
 	docker exec -it school-postgres dropdb school_db
 
 migrateup:
-	migrate -path db/migration -database "postgresql://postgres:secret@localhost:5434/school_db?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5434/school_db?sslmode=disable" -verbose up
 
 migratedown:
 	migrate -path db/migration -database "postgresql://postgres:secret@localhost:5434/school_db?sslmode=disable" -verbose down
@@ -18,4 +18,13 @@ sqlc:
 
 server:
 	go run main.go
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc
+
+down:
+	docker compose down 
+
+up:
+	docker compose up -d 
+
+build:
+	docker build -t school-api:latest .
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc server down up build

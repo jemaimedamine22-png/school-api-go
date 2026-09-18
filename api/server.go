@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jemaimedamine22-png/school-api/db"
+	//"github.com/prometheus/client_golang/prometheus/promhttp"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 type Server struct {
@@ -14,6 +16,11 @@ type Server struct {
 func NewServer(store *db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
+
+	p := ginprometheus.NewPrometheus("gin")
+    p.Use(router)
+
+
 	// API of department
 	router.POST("/departments", server.createDepartment)
 	router.GET("/departments/:id", server.getDepartment)
@@ -26,6 +33,8 @@ func NewServer(store *db.Store) *Server {
 	router.POST("/professors", server.createProfessor)
 	router.GET("/professors/:id", server.getProfessor)
 	router.GET("/professors", server.listProfessors)
+	//metrics
+	//router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.router = router
 	return server
 }

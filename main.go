@@ -8,6 +8,7 @@ import (
 	"github.com/jemaimedamine22-png/school-api/api"
     "github.com/jemaimedamine22-png/school-api/db"
     "github.com/jemaimedamine22-png/school-api/util"
+
 )
 
 func main() {
@@ -35,4 +36,6 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
+
+	
 }

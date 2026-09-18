@@ -1,0 +1,189 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 0. Nginx Reverse Proxy
+  # ==========================================
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443" # مخصص لشهادات الأمان HTTPS لاحقاً
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - school-net
+
+  # ==========================================
+  # 1. School API Application
+  # ==========================================
+  api:
+    build: .
+    container_name: school-api
+    restart: always
+    # تم إزالة ports: - "8080:8080" لأن الوصول أصبح حصرياً عبر Nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app.env:/app/app.env
+    environment:
+      - DB_SOURCE=postgresql://root:secret@postgres:5432/school_db?sslmode=disable
+    depends_on:
+      - postgres
+      - otel-collector
+    networks:
+      - school-net
+
+  # ==========================================
+  # 2. PostgreSQL Database
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: school_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - school-net
+
+  # ==========================================
+  # 3. cAdvisor (Container Resource Monitoring)
+  # ==========================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - school-net
+
+  # ==========================================
+  # 4. Prometheus (Metrics Scraper)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - school-net
+
+  # ==========================================
+  # 5. Grafana (Visualization Dashboard)
+  # ==========================================
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - school-net
+
+  # ==========================================
+  # 6. Loki (Log Aggregation)
+  # ==========================================
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - school-net
+
+  # ==========================================
+  # 7. Tempo (Distributed Tracing)
+  # ==========================================
+  tempo:
+    image: grafana/tempo:2.4.0
+    container_name: tempo
+    restart: always
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./monitoring/tempo-config.yaml:/etc/tempo/tempo.yaml
+      - tempo_data:/tmp/tempo
+    command: [ "-config.file=/etc/tempo/tempo.yaml" ]
+    networks:
+      - school-net
+
+  # ==========================================
+  # 8. OpenTelemetry Collector
+  # ==========================================
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.96.0
+    container_name: otel-collector
+    restart: always
+    ports:
+      - "4319:4317"
+      - "4320:4318"
+    volumes:
+      - ./monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    command: [ "--config=/etc/otelcol-contrib/config.yaml" ]
+    depends_on:
+      - tempo
+    networks:
+      - school-net
+
+  # ==========================================
+  # 9. Promtail (Log Collector)
+  # ==========================================
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail
+    restart: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./monitoring/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - school-net
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  tempo_data:
+
+networks:
+  school-net:
+    driver: bridge
