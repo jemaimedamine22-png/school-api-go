@@ -5,6 +5,7 @@ import (
 	"github.com/jemaimedamine22-png/school-api/db"
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type Server struct {
@@ -20,6 +21,7 @@ func NewServer(store *db.Store) *Server {
 	p := ginprometheus.NewPrometheus("gin")
     p.Use(router)
 
+	router.Use(otelgin.Middleware("school-api"))
 
 	// API of department
 	router.POST("/departments", server.createDepartment)

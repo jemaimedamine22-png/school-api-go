@@ -1,14 +1,7 @@
+target: all
+
 server:
   http_listen_port: 3200
-
-distributor:
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-          endpoint: 0.0.0.0:4317
-        http:
-          endpoint: 0.0.0.0:4318
 
 storage:
   trace:
@@ -17,7 +10,12 @@ storage:
       path: /tmp/tempo/blocks
 
 compactor:
-  storage:
-    backend: local
-    local:
-      path: /tmp/tempo/compactor
+  ring:
+    kvstore:
+      store: inmemory
+
+memberlist:
+  abort_if_cluster_join_fails: false
+  bind_port: 7946
+  join_members:
+    - 127.0.0.1:7946
