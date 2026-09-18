@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build Stage (بناء التطبيق)
 # ==========================================
-FROM golang:1.26-alpine AS builder
+FROM golang:1.26.0-alpine AS builder
 
 # تثبيت الأدوات الأساسية المطلوبة لتحميل الحزم
 RUN apk add --no-cache git ca-certificates tzdata
@@ -24,7 +24,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main main.go
 # ==========================================
 # Stage 2: Final Security Stage (النسخة النهائية الآمنة)
 # ==========================================
-FROM alpine:3.19
+FROM alpine:3.21
 
 # تثبيت شهادات الأمان الأساسية والوقت
 RUN apk add --no-cache ca-certificates tzdata
