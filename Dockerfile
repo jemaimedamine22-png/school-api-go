@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build Stage (بناء التطبيق)
 # ==========================================
-FROM golang:1.26.0-alpine AS builder
+FROM golang:1.26.6-alpine AS builder
 
 # تثبيت الأدوات الأساسية المطلوبة لتحميل الحزم
 RUN apk add --no-cache git ca-certificates tzdata
